@@ -1,0 +1,42 @@
+CREATE TABLE IF NOT EXISTS timelinepost (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS hobbies (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    source TEXT NOT NULL,
+    UNIQUE(title)
+);
+
+CREATE TABLE IF NOT EXISTS work_experiences (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL,
+    role VARCHAR(255) NOT NULL,
+    startdate VARCHAR(50) NOT NULL,
+    enddate VARCHAR(50) NOT NULL,
+    description TEXT NOT NULL,
+    UNIQUE(title, role)
+);
+
+CREATE TABLE IF NOT EXISTS education (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL,
+    startdate VARCHAR(50) NOT NULL,
+    enddate VARCHAR(50) NOT NULL,
+    description TEXT NOT NULL,
+    UNIQUE(title)
+);
+
+CREATE TABLE IF NOT EXISTS locations (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    lat DOUBLE NOT NULL,
+    lng DOUBLE NOT NULL,
+    UNIQUE(name)
+);
