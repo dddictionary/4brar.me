@@ -76,34 +76,24 @@ def nav_items():
 def hobby_items():
     hobbyitems = [
         {
-            "title": "Roblox",
-            "description": "I love playing roblox it is so fun and I do this all day",
-            "source": "https://i.pinimg.com/originals/37/07/a7/3707a7cd7d384511c213b2a12dc3f0a7.jpg",
+            "title": "Soccer",
+            "description": "Whether it's a pickup game or watching a match, soccer has always been my go-to sport. Nothing beats the flow of a good game.",
+            "source": "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&h=500&fit=crop",
         },
         {
-            "title": "Mountain Climbing",
-            "description": "There is nothing like climbing up a cliff-side on a hot sunny day with my VR",
-            "source": "https://i.ytimg.com/vi/xAYuh4NQVeE/maxresdefault.jpg",
+            "title": "Rock Climbing",
+            "description": "Bouldering is my favorite way to problem-solve off the keyboard. Every route is a puzzle that demands both strength and strategy.",
+            "source": "https://images.unsplash.com/photo-1522362485439-83fcff4673f0?w=500&h=500&fit=crop",
         },
         {
-            "title": "Lorem",
-            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-            "source": "https://dummyimage.com/500x500/ffffff/000000",
+            "title": "Driving",
+            "description": "Long drives with good music are underrated. There's something about the open road that clears the mind.",
+            "source": "https://images.unsplash.com/photo-1449965408869-ebd13bc9e5a8?w=500&h=500&fit=crop",
         },
         {
-            "title": "Lorem",
-            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-            "source": "https://dummyimage.com/500x500/ffffff/000000",
-        },
-        {
-            "title": "Lorem",
-            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-            "source": "https://dummyimage.com/500x500/ffffff/000000",
-        },
-        {
-            "title": "Lorem",
-            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-            "source": "https://dummyimage.com/500x500/ffffff/000000",
+            "title": "Coding",
+            "description": "Building things in my free time is how I stay sharp and explore new ideas. This website is one of those projects.",
+            "source": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500&h=500&fit=crop",
         },
     ]
     return {"hobbies": hobbyitems}
