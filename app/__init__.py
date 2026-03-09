@@ -113,25 +113,25 @@ def hobby_items():
 def work_experiences():
     work_data = [
         {
-            "title": "Apple",
-            "role": "Full-stack Developer",
-            "startdate": "Jan 2023",
+            "title": "Shopify",
+            "role": "Engineering Intern",
+            "startdate": "Sep 2025",
             "enddate": "Present",
-            "description": "Ate apples all day and removed oranges from the restrooms every night. Blockchain bananas.",
-        },
-        {
-            "title": "Google",
-            "role": "Front-end Specialist",
-            "startdate": "Jul 2021",
-            "enddate": "Dec 2022",
-            "description": "Used Google search 10000 times to search up how to create a website",
+            "description": "Led Tier 1 migration of transactional messaging pipeline from single-region to dual-region using Kubernetes overlay architecture. Developed static analysis tooling that identified 40+ security vulnerabilities across 330K+ lines of Ruby code.",
         },
         {
             "title": "Meta",
-            "role": "Mobile App Intern",
-            "startdate": "May 2021",
-            "enddate": "Aug 2021",
-            "description": "Assisted in the development of a mobile application for inventory management. Probably gained experience with mobile development frameworks and agile methodologies.",
+            "role": "Production Engineering Fellow",
+            "startdate": "Jun 2025",
+            "enddate": "Sep 2025",
+            "description": "Deployed containerized web application using Docker and Nginx reverse proxy for production workloads. Implemented monitoring and alerting stack with Prometheus and Grafana.",
+        },
+        {
+            "title": "ACM CCNY",
+            "role": "Backend Engineer & Teaching Assistant",
+            "startdate": "Jun 2024",
+            "enddate": "Aug 2025",
+            "description": "Built fault-tolerant Node.js backend handling 10GB+ across 5+ databases with automated daily backups. Led team of 5 to deliver MERN MVP in 8 weeks using sprint planning and agile workflows.",
         },
     ]
     return {"work": work_data}
@@ -141,16 +141,10 @@ def work_experiences():
 def education_experiences():
     education_data = [
         {
-            "title": "Generic High School",
-            "startdate": "Sep 2018",
-            "enddate": "June 2022",
-            "description": "Acted in a musical, you might have heard of it.",
-        },
-        {
-            "title": "Monster's University",
+            "title": "CUNY City College of New York",
             "startdate": "Aug 2022",
-            "enddate": "May 2026",
-            "description": "Learned to scare children and the effects of their fear on our world's ecosystem",
+            "enddate": "Dec 2025",
+            "description": "Bachelor of Science in Computer Science. Relevant coursework in Data Structures, Algorithms, Operating Systems, Computer Networks, and Database Systems.",
         },
     ]
     return {"education": education_data}
