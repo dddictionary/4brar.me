@@ -16,6 +16,7 @@ RUN touch src/main.rs && cargo build --release --target x86_64-unknown-linux-mus
 
 # Stage 2: Runtime (minimal Alpine image)
 FROM alpine:3.21
+LABEL org.opencontainers.image.source=https://github.com/dddictionary/portfolio
 RUN apk add --no-cache ca-certificates
 
 WORKDIR /app

@@ -1,17 +1,61 @@
-name: Deploy  
+name: Deploy
 
-on: 
+on:
   push:
     branches:
       - main
-  
+
   workflow_dispatch:
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
+  build-and-push:
+    name: "Build & Push Image"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
   deploy:
-    name: "Deploy to VPS"
+    name: "Deploy to k3s"
+    needs: build-and-push
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh/
@@ -28,20 +72,80 @@ jobs:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_IP: ${{ secrets.SSH_IP }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      
-      - name: Create .env file on server
+
+      - name: Copy k8s manifests to server
         run: |
-          ssh droplet "mkdir -p /root/portfolio && printf 'MYSQL_DATABASE=%s\nMYSQL_USER=%s\nMYSQL_PASSWORD=%s\nMYSQL_HOST=%s\nURL=%s\nCERTBOT_EMAIL=%s\nMARIADB_ROOT_PASSWORD=%s\nGRAFANA_PASSWORD=%s\n' '$MYSQL_DATABASE' '$MYSQL_USER' '$MYSQL_PASSWORD' '$MYSQL_HOST' '$URL' '$CERTBOT_EMAIL' '$MARIADB_ROOT_PASSWORD' '$GRAFANA_PASSWORD' > /root/portfolio/.env"
+          ssh droplet "mkdir -p /root/k8s"
+          scp -r k8s/* droplet:/root/k8s/
+
+      - name: Apply secrets (idempotent)
+        run: |
+          ssh droplet "
+            export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+
+            # Backend secrets
+            kubectl -n portfolio create secret generic backend-secrets \
+              --from-literal=MYSQL_DATABASE='$MYSQL_DATABASE' \
+              --from-literal=MYSQL_USER='$MYSQL_USER' \
+              --from-literal=MYSQL_PASSWORD='$MYSQL_PASSWORD' \
+              --from-literal=MYSQL_HOST=mariadb \
+              --from-literal=URL='$URL' \
+              --dry-run=client -o yaml | kubectl apply -f -
+
+            # MariaDB secrets
+            kubectl -n portfolio create secret generic mariadb-secrets \
+              --from-literal=MYSQL_DATABASE='$MYSQL_DATABASE' \
+              --from-literal=MYSQL_USER='$MYSQL_USER' \
+              --from-literal=MYSQL_PASSWORD='$MYSQL_PASSWORD' \
+              --from-literal=MARIADB_ROOT_PASSWORD='$MARIADB_ROOT_PASSWORD' \
+              --dry-run=client -o yaml | kubectl apply -f -
+
+            # Grafana secrets
+            kubectl -n monitoring create secret generic grafana-secrets \
+              --from-literal=GRAFANA_PASSWORD='$GRAFANA_PASSWORD' \
+              --dry-run=client -o yaml | kubectl apply -f -
+          "
         env:
           MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
           MYSQL_USER: ${{ secrets.MYSQL_USER }}
           MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-          MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
-          URL: ${{ secrets.URL }}
-          CERTBOT_EMAIL: ${{ secrets.CERTBOT_EMAIL }}
           MARIADB_ROOT_PASSWORD: ${{ secrets.MARIADB_ROOT_PASSWORD }}
+          URL: ${{ secrets.URL }}
           GRAFANA_PASSWORD: ${{ secrets.GRAFANA_PASSWORD }}
 
-      - name: Deploy site
+      - name: Apply cert-manager issuer
         run: |
-          ssh droplet 'set -e && if [ ! -d /root/portfolio/.git ]; then git clone https://github.com/dddictionary/portfolio.git /root/portfolio; fi && cd /root/portfolio && git fetch && git reset origin/main --hard && docker compose -f docker-compose.prod.yml -f docker-compose.monitoring.yml down && docker compose -f docker-compose.prod.yml up -d --build && docker compose -f docker-compose.monitoring.yml up -d --build'
+          ssh droplet "
+            export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+
+            # Substitute CERTBOT_EMAIL in cert-issuer
+            sed -i 's/\${CERTBOT_EMAIL}/$CERTBOT_EMAIL/' /root/k8s/ingress/cert-issuer.yaml
+
+            kubectl apply -f /root/k8s/ingress/cert-issuer.yaml
+          "
+        env:
+          CERTBOT_EMAIL: ${{ secrets.CERTBOT_EMAIL }}
+
+      - name: Apply k8s manifests
+        run: |
+          ssh droplet "
+            export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+
+            # Apply namespaces first
+            kubectl apply -f /root/k8s/namespace.yaml
+
+            # Apply all manifests
+            kubectl apply -R -f /root/k8s/mariadb/
+            kubectl apply -R -f /root/k8s/backend/
+            kubectl apply -R -f /root/k8s/ingress/
+            kubectl apply -R -f /root/k8s/monitoring/
+          "
+
+      - name: Rolling update backend
+        run: |
+          IMAGE_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$(echo ${{ github.sha }} | cut -c1-7)"
+          ssh droplet "
+            export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+            kubectl -n portfolio set image deployment/backend backend=${IMAGE_TAG}
+            kubectl -n portfolio rollout status deployment/backend --timeout=300s
+          "
