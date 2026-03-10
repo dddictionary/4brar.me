@@ -11,32 +11,117 @@ jobs:
   test:
     runs-on: ubuntu-latest
     name: Run Tests
+    services:
+      mysql:
+        image: mariadb
+        env:
+          MARIADB_ROOT_PASSWORD: testpass
+          MYSQL_DATABASE: testdb
+          MYSQL_USER: testuser
+          MYSQL_PASSWORD: testpass
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     env:
-      TESTING: true
+      MYSQL_HOST: 127.0.0.1
+      MYSQL_USER: testuser
+      MYSQL_PASSWORD: testpass
+      MYSQL_DATABASE: testdb
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9.21'
-
-      - name: Setup Python Virtual Environment
-        run: python -m venv .venv
-
-      - name: Install dependencies
-        run: .venv/bin/pip install -r requirements.txt
-
-      - name: Run Tests
-        run: ./run_test.sh
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Run tests
+        run: cargo test
 
   build:
     runs-on: ubuntu-latest
     name: Build Docker Image
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
+      - uses: actions/checkout@v4
       - name: Build Docker image
-        run: docker build -t portfolio:ci .
+        run: docker build -t backend:ci .
+
+  integration:
+    runs-on: ubuntu-latest
+    name: Integration Tests (Docker Compose)
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create .env file
+        run: |
+          cat <<'EOF' > .env
+          MYSQL_DATABASE=testdb
+          MYSQL_USER=testuser
+          MYSQL_PASSWORD=testpass
+          MYSQL_HOST=mysql
+          MARIADB_ROOT_PASSWORD=testpass
+          URL=localhost:5000
+          EOF
+
+      - name: Start Docker Compose stack
+        run: docker compose up -d --build
+
+      - name: Wait for app to be healthy
+        run: |
+          for i in $(seq 1 30); do
+            if curl -s -o /dev/null -w '%{http_code}' http://localhost:5000/ | grep -q 200; then
+              echo "App is healthy after ${i}s"
+              exit 0
+            fi
+            echo "Waiting for app... (${i}/30)"
+            sleep 1
+          done
+          echo "App failed to become healthy within 30 seconds"
+          docker compose logs
+          exit 1
+
+      - name: Test page routes return 200
+        run: |
+          routes="/ /aboutme /work /education /hobbies /travels /timeline"
+          for route in $routes; do
+            status=$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:5000${route}")
+            if [ "$status" != "200" ]; then
+              echo "FAIL: ${route} returned ${status}"
+              exit 1
+            fi
+            echo "OK: ${route} returned 200"
+          done
+
+      - name: Test POST /api/timeline_post
+        run: |
+          status=$(curl -s -o /dev/null -w '%{http_code}' \
+            -X POST \
+            -d "name=TestUser&email=test@example.com&content=Integration+test+post" \
+            http://localhost:5000/api/timeline_post)
+          if [ "$status" != "200" ]; then
+            echo "FAIL: POST /api/timeline_post returned ${status}"
+            exit 1
+          fi
+          echo "OK: POST /api/timeline_post returned 200"
+
+      - name: Test GET /api/timeline_post
+        run: |
+          status=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:5000/api/timeline_post)
+          if [ "$status" != "200" ]; then
+            echo "FAIL: GET /api/timeline_post returned ${status}"
+            exit 1
+          fi
+          echo "OK: GET /api/timeline_post returned 200"
+
+      - name: Test /metrics returns 200
+        run: |
+          status=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:5000/metrics)
+          if [ "$status" != "200" ]; then
+            echo "FAIL: /metrics returned ${status}"
+            exit 1
+          fi
+          echo "OK: /metrics returned 200"
+
+      - name: Tear down Docker Compose stack
+        if: always()
+        run: docker compose down

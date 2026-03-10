@@ -1,14 +1,27 @@
-FROM python:3.9-slim-buster
+# Stage 1: Build (musl static binary)
+FROM rust:1.85-slim-bookworm AS builder
+WORKDIR /build
 
-# TODO: Change this workdir!!
-WORKDIR /root/portfolio
+RUN apt-get update && apt-get install -y musl-tools pkg-config libssl-dev && rm -rf /var/lib/apt/lists/*
+RUN rustup target add x86_64-unknown-linux-musl
 
-COPY requirements.txt .
+# Cache dependency compilation
+COPY Cargo.toml Cargo.lock ./
+RUN mkdir src && echo "fn main() {}" > src/main.rs && cargo build --release --target x86_64-unknown-linux-musl && rm -rf src
 
-RUN pip3 install -r requirements.txt
+# Build actual application
+COPY src/ src/
+COPY migrations/ migrations/
+RUN touch src/main.rs && cargo build --release --target x86_64-unknown-linux-musl
 
-COPY . .
+# Stage 2: Runtime (minimal Alpine image)
+FROM alpine:3.21
+RUN apk add --no-cache ca-certificates
 
-CMD ["flask", "run", "--host=0.0.0.0"]
+WORKDIR /app
+COPY --from=builder /build/target/x86_64-unknown-linux-musl/release/backend /app/backend
+COPY app/templates/ /app/app/templates/
+COPY app/static/ /app/app/static/
 
 EXPOSE 5000
+CMD ["/app/backend"]
