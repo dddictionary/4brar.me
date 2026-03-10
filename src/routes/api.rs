@@ -58,6 +58,17 @@ pub async fn test_ci() -> Json<serde_json::Value> {
     Json(json!("ci should be working and this endpoint should be reachable"))
 }
 
+pub async fn healthz(
+    State(state): State<Arc<AppState>>,
+) -> Result<impl IntoResponse, (StatusCode, String)> {
+    sqlx::query("SELECT 1")
+        .execute(&state.db)
+        .await
+        .map_err(|e| (StatusCode::SERVICE_UNAVAILABLE, e.to_string()))?;
+
+    Ok(Json(json!({ "status": "ok" })))
+}
+
 pub async fn metrics_handler(
     State(state): State<Arc<AppState>>,
 ) -> String {

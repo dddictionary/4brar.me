@@ -108,6 +108,7 @@ async fn main() {
             get(routes::api::get_timeline_posts).post(routes::api::post_timeline_post),
         )
         .route("/api/test-ci", get(routes::api::test_ci))
+        .route("/healthz", get(routes::api::healthz))
         .route("/metrics", get(routes::api::metrics_handler))
         .nest_service("/static", ServeDir::new("app/static"))
         .layer(middleware::from_fn(track_metrics))
