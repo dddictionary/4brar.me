@@ -50,14 +50,14 @@
     document.getElementById('postForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const formData = new FormData();
-        formData.append('name', document.getElementById('name').value);
-        formData.append('email', document.getElementById('email').value);
-        formData.append('content', document.getElementById('content').value);
+        const params = new URLSearchParams();
+        params.append('name', document.getElementById('name').value);
+        params.append('email', document.getElementById('email').value);
+        params.append('content', document.getElementById('content').value);
 
         await fetch('/api/timeline_post', {
             method: 'POST',
-            body: formData
+            body: params
         });
 
         document.getElementById('postForm').reset();

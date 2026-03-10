@@ -23,16 +23,19 @@ pub async fn create_post(
     email: &str,
     content: &str,
 ) -> Result<TimelinePost, sqlx::Error> {
-    sqlx::query("INSERT INTO timelinepost (name, email, content) VALUES (?, ?, ?)")
+    let result = sqlx::query("INSERT INTO timelinepost (name, email, content) VALUES (?, ?, ?)")
         .bind(name)
         .bind(email)
         .bind(content)
         .execute(pool)
         .await?;
 
+    let id = result.last_insert_id();
+
     sqlx::query_as::<_, TimelinePost>(
-        "SELECT id, name, email, content, created_at FROM timelinepost WHERE id = LAST_INSERT_ID()",
+        "SELECT id, name, email, content, created_at FROM timelinepost WHERE id = ?",
     )
+    .bind(id)
     .fetch_one(pool)
     .await
 }
