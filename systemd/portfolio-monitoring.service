@@ -1,0 +1,14 @@
+[Unit]
+Description=Portfolio Monitoring (prometheus + grafana + node-exporter + cadvisor)
+Requires=docker.service portfolio.service
+After=docker.service portfolio.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/root/portfolio
+ExecStart=/usr/bin/docker compose -f docker-compose.monitoring.yml up -d
+ExecStop=/usr/bin/docker compose -f docker-compose.monitoring.yml down
+
+[Install]
+WantedBy=multi-user.target
