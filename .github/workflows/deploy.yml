@@ -1,15 +1,46 @@
-name: Deploy  
+name: Deploy
 
-on: 
+on:
   push:
     branches:
       - main
-  
+
   workflow_dispatch:
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
+  build-and-push:
+    name: "Build & Push Image"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
   deploy:
     name: "Deploy to VPS"
+    needs: build-and-push
     runs-on: ubuntu-latest
     steps:
       - name: Configure SSH
@@ -28,7 +59,10 @@ jobs:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_IP: ${{ secrets.SSH_IP }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Create .env file on server
         run: |
           ssh droplet "mkdir -p /root/portfolio && printf 'MYSQL_DATABASE=%s\nMYSQL_USER=%s\nMYSQL_PASSWORD=%s\nMYSQL_HOST=%s\nURL=%s\nCERTBOT_EMAIL=%s\nMARIADB_ROOT_PASSWORD=%s\nGRAFANA_PASSWORD=%s\n' '$MYSQL_DATABASE' '$MYSQL_USER' '$MYSQL_PASSWORD' '$MYSQL_HOST' '$URL' '$CERTBOT_EMAIL' '$MARIADB_ROOT_PASSWORD' '$GRAFANA_PASSWORD' > /root/portfolio/.env"
