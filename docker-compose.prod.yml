@@ -2,7 +2,7 @@ version: "3"
 services:
   myportfolio:
     container_name: myportfolio
-    image: ghcr.io/dddictionary/portfolio:latest
+    build: .
     restart: always
     env_file:
       - .env
