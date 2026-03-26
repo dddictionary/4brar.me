@@ -3,13 +3,15 @@ set -euo pipefail
 
 COMPOSE="docker compose -f docker-compose.prod.yml"
 SERVICE="myportfolio"
+IMAGE="ghcr.io/dddictionary/4brar.me:latest"
 HEALTH_TIMEOUT=30
+
+# Pull the pre-built image first (before touching any running containers)
+echo "Pulling latest image..."
+docker pull "$IMAGE"
 
 # Ensure nginx and mysql are running (no-op if already up)
 $COMPOSE up -d mysql nginx
-
-# Build the new app image
-$COMPOSE build "$SERVICE"
 
 # Capture old container ID(s)
 OLD_IDS=$($COMPOSE ps -q "$SERVICE")

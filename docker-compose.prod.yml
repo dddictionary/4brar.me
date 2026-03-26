@@ -1,7 +1,7 @@
 version: "3"
 services:
   myportfolio:
-    build: .
+    image: ghcr.io/dddictionary/4brar.me:latest
     restart: always
     env_file:
       - .env
