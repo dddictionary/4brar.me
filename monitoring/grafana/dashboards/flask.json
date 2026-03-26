@@ -5,8 +5,8 @@
   "graphTooltip": 1,
   "id": null,
   "uid": "flask-app",
-  "title": "Flask Application",
-  "tags": ["flask"],
+  "title": "Portfolio Application",
+  "tags": ["portfolio"],
   "timezone": "browser",
   "refresh": "10s",
   "schemaVersion": 39,
@@ -22,8 +22,8 @@
       },
       "targets": [
         {
-          "expr": "rate(flask_http_request_total[1m])",
-          "legendFormat": "{{method}} {{status}} {{endpoint}}"
+          "expr": "rate(http_requests_total[1m])",
+          "legendFormat": "{{method}} {{status}} {{path}}"
         }
       ]
     },
@@ -38,8 +38,8 @@
       },
       "targets": [
         {
-          "expr": "rate(flask_http_request_total{status=~\"5..\"}[1m])",
-          "legendFormat": "{{method}} {{status}} {{endpoint}}"
+          "expr": "rate(http_requests_total{status=~\"5..\"}[1m])",
+          "legendFormat": "{{method}} {{status}} {{path}}"
         }
       ]
     },
@@ -54,15 +54,15 @@
       },
       "targets": [
         {
-          "expr": "histogram_quantile(0.50, rate(flask_http_request_duration_seconds_bucket[1m]))",
+          "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket[1m]))",
           "legendFormat": "p50"
         },
         {
-          "expr": "histogram_quantile(0.95, rate(flask_http_request_duration_seconds_bucket[1m]))",
+          "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[1m]))",
           "legendFormat": "p95"
         },
         {
-          "expr": "histogram_quantile(0.99, rate(flask_http_request_duration_seconds_bucket[1m]))",
+          "expr": "histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[1m]))",
           "legendFormat": "p99"
         }
       ]
@@ -74,13 +74,13 @@
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
-          "expr": "sum by (status) (increase(flask_http_request_total[5m]))",
+          "expr": "sum by (status) (increase(http_requests_total[5m]))",
           "legendFormat": "{{status}}"
         }
       ]
     },
     {
-      "title": "Exceptions Total",
+      "title": "Error Responses (4xx + 5xx)",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
@@ -90,20 +90,20 @@
       },
       "targets": [
         {
-          "expr": "rate(flask_http_request_exceptions_total[1m])",
-          "legendFormat": "{{method}} {{endpoint}}"
+          "expr": "rate(http_requests_total{status=~\"[45]..\"}[1m])",
+          "legendFormat": "{{method}} {{path}} {{status}}"
         }
       ]
     },
     {
-      "title": "Requests by Endpoint",
+      "title": "Requests by Path",
       "type": "bargauge",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
-          "expr": "sum by (endpoint) (increase(flask_http_request_total[5m]))",
-          "legendFormat": "{{endpoint}}"
+          "expr": "sum by (path) (increase(http_requests_total[5m]))",
+          "legendFormat": "{{path}}"
         }
       ]
     }
