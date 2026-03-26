@@ -43,6 +43,14 @@ async fn track_metrics(req: Request<axum::body::Body>, next: Next) -> impl IntoR
     metrics::histogram!("http_request_duration_seconds", &labels).record(duration);
     metrics::counter!("http_requests_total", &labels).increment(1);
 
+    tracing::info!(
+        method = labels[0].1,
+        path = labels[1].1,
+        status = labels[2].1,
+        duration_ms = format!("{:.2}", duration * 1000.0),
+        "request completed"
+    );
+
     response
 }
 
