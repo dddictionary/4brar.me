@@ -73,7 +73,7 @@ jobs:
 
       - name: Deploy site
         run: |
-          ssh droplet 'set -e &&
+          ssh droplet "set -e &&
             if [ ! -d /root/portfolio/.git ]; then
               git clone https://github.com/dddictionary/portfolio.git /root/portfolio
             fi &&
@@ -86,8 +86,13 @@ jobs:
             systemctl daemon-reload &&
             systemctl enable portfolio.service portfolio-monitoring.service &&
 
+            # Authenticate with GHCR to pull the pre-built image
+            echo '${GHCR_PAT}' | docker login ghcr.io -u dddictionary --password-stdin &&
+
             # Zero-downtime deploy (pulls pre-built image, then swaps)
             bash scripts/deploy.sh &&
 
             # Restart monitoring stack
-            systemctl restart portfolio-monitoring.service'
+            systemctl restart portfolio-monitoring.service"
+        env:
+          GHCR_PAT: ${{ secrets.GHCR_PAT }}
