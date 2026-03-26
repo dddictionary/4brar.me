@@ -1,7 +1,6 @@
 version: "3"
 services:
   myportfolio:
-    container_name: myportfolio
     build: .
     restart: always
     env_file:
@@ -10,6 +9,12 @@ services:
       - mysql
     networks:
       - portfolio_net
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5000/metrics"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
 
 
   mysql:

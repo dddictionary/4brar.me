@@ -57,6 +57,8 @@ jobs:
             systemctl daemon-reload &&
             systemctl enable portfolio.service portfolio-monitoring.service &&
 
-            # Deploy
-            systemctl restart portfolio.service &&
+            # Zero-downtime deploy
+            bash scripts/deploy.sh &&
+
+            # Restart monitoring stack
             systemctl restart portfolio-monitoring.service'
