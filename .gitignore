@@ -3,6 +3,7 @@
 undo/
 service_logs.txt
 
-# Added by cargo
-
-/target
+# Python
+__pycache__/
+*.pyc
+.venv/

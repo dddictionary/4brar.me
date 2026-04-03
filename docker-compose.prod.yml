@@ -10,7 +10,7 @@ services:
     networks:
       - portfolio_net
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5000/metrics"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/metrics')"]
       interval: 5s
       timeout: 3s
       retries: 3

@@ -11,32 +11,15 @@ jobs:
   test:
     runs-on: ubuntu-latest
     name: Run Tests
-    services:
-      mysql:
-        image: mariadb
-        env:
-          MARIADB_ROOT_PASSWORD: testpass
-          MYSQL_DATABASE: testdb
-          MYSQL_USER: testuser
-          MYSQL_PASSWORD: testpass
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="healthcheck.sh --connect --innodb_initialized"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-    env:
-      MYSQL_HOST: 127.0.0.1
-      MYSQL_USER: testuser
-      MYSQL_PASSWORD: testpass
-      MYSQL_DATABASE: testdb
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest pytest-asyncio httpx
       - name: Run tests
-        run: cargo test
+        run: pytest tests/ -v
 
   build:
     runs-on: ubuntu-latest
