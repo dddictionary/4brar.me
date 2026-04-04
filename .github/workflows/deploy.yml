@@ -86,13 +86,12 @@ jobs:
             systemctl daemon-reload &&
             systemctl enable portfolio.service portfolio-monitoring.service &&
 
-            # Authenticate with GHCR to pull the pre-built image
+            # Authenticate with GHCR and pull the latest image
             echo '${GHCR_PAT}' | docker login ghcr.io -u dddictionary --password-stdin &&
+            docker compose -f docker-compose.prod.yml pull &&
 
-            # Zero-downtime deploy (pulls pre-built image, then swaps)
-            bash scripts/deploy.sh &&
-
-            # Restart monitoring stack
+            # Restart services
+            docker compose -f docker-compose.prod.yml up -d &&
             systemctl restart portfolio-monitoring.service"
         env:
           GHCR_PAT: ${{ secrets.GHCR_PAT }}
