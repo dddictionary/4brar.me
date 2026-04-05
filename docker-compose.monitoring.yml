@@ -60,6 +60,31 @@ services:
     networks:
       - monitoring_net
 
+  loki:
+    container_name: loki
+    image: grafana/loki
+    restart: always
+    command: -config.file=/etc/loki/loki-config.yml
+    volumes:
+      - ./monitoring/loki.yml:/etc/loki/loki-config.yml
+      - loki_data:/loki
+    networks:
+      - monitoring_net
+
+  promtail:
+    container_name: promtail
+    image: grafana/promtail
+    restart: always
+    command: -config.file=/etc/promtail/promtail-config.yml
+    volumes:
+      - ./monitoring/promtail.yml:/etc/promtail/promtail-config.yml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - loki
+    networks:
+      - monitoring_net
+
   nginx-monitoring:
     container_name: nginx-monitoring
     image: nginx:alpine
@@ -74,6 +99,7 @@ services:
 volumes:
   prometheus_data:
   grafana_data:
+  loki_data:
 
 networks:
   monitoring_net:
