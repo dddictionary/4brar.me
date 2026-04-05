@@ -16,7 +16,6 @@ services:
       retries: 3
       start_period: 10s
 
-
   mysql:
     container_name: mysql
     image: mariadb
@@ -28,18 +27,12 @@ services:
     networks:
       - portfolio_net
 
-  nginx:
-    container_name: nginx
-    image: jonasal/nginx-certbot
+  nginx-app:
+    container_name: nginx-app
+    image: nginx:alpine
     restart: always
-    environment:
-      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
-    ports:
-      - 80:80
-      - 443:443
     volumes:
-      - nginx_secrets:/etc/letsencrypt
-      - ./user_conf.d:/etc/nginx/user_conf.d
+      - ./user_conf.d:/etc/nginx/conf.d
     depends_on:
       - myportfolio
     networks:
@@ -47,7 +40,6 @@ services:
 
 volumes:
   mydatabase:
-  nginx_secrets:
 
 networks:
   portfolio_net:

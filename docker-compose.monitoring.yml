@@ -27,7 +27,6 @@ services:
       - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
     networks:
       - monitoring_net
-      - portfolio_net
 
   node-exporter:
     container_name: node-exporter
@@ -58,6 +57,17 @@ services:
     privileged: true
     devices:
       - /dev/kmsg:/dev/kmsg
+    networks:
+      - monitoring_net
+
+  nginx-monitoring:
+    container_name: nginx-monitoring
+    image: nginx:alpine
+    restart: always
+    volumes:
+      - ./monitoring/nginx/user_conf.d:/etc/nginx/conf.d
+    depends_on:
+      - grafana
     networks:
       - monitoring_net
 

@@ -1,0 +1,28 @@
+version: "3"
+services:
+  nginx-router:
+    container_name: nginx-router
+    image: jonasal/nginx-certbot
+    restart: always
+    environment:
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - nginx_router_secrets:/etc/letsencrypt
+      - ./router/user_conf.d:/etc/nginx/user_conf.d
+    networks:
+      - portfolio_net
+      - monitoring_net
+
+volumes:
+  nginx_router_secrets:
+
+networks:
+  portfolio_net:
+    external: true
+    name: portfolio_net
+  monitoring_net:
+    external: true
+    name: monitoring_net
