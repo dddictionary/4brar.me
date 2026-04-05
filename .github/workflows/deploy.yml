@@ -80,18 +80,12 @@ jobs:
             cd /root/portfolio &&
             git fetch && git reset origin/main --hard &&
 
-            # Install systemd services (idempotent)
-            cp systemd/portfolio.service /etc/systemd/system/ &&
-            cp systemd/portfolio-monitoring.service /etc/systemd/system/ &&
-            systemctl daemon-reload &&
-            systemctl enable portfolio.service portfolio-monitoring.service &&
-
             # Authenticate with GHCR and pull the latest image
             echo '${GHCR_PAT}' | docker login ghcr.io -u dddictionary --password-stdin &&
             docker compose -f docker-compose.prod.yml pull &&
 
             # Restart services
             docker compose -f docker-compose.prod.yml up -d &&
-            systemctl restart portfolio-monitoring.service"
+            docker compose -f docker-compose.monitoring.yml up -d"
         env:
           GHCR_PAT: ${{ secrets.GHCR_PAT }}
