@@ -11,6 +11,7 @@ services:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.retention.time=30d"
     networks:
+      - monitoring_net
       - portfolio_net
 
   grafana:
@@ -25,6 +26,7 @@ services:
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
       - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
     networks:
+      - monitoring_net
       - portfolio_net
 
   node-exporter:
@@ -41,7 +43,7 @@ services:
       - "--path.rootfs=/rootfs"
       - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
     networks:
-      - portfolio_net
+      - monitoring_net
 
   cadvisor:
     container_name: cadvisor
@@ -57,13 +59,16 @@ services:
     devices:
       - /dev/kmsg:/dev/kmsg
     networks:
-      - portfolio_net
+      - monitoring_net
 
 volumes:
   prometheus_data:
   grafana_data:
 
 networks:
+  monitoring_net:
+    external: true
+    name: monitoring_net
   portfolio_net:
     external: true
     name: portfolio_net

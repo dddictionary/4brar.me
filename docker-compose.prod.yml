@@ -51,4 +51,5 @@ volumes:
 
 networks:
   portfolio_net:
+    external: true
     name: portfolio_net
