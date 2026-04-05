@@ -810,7 +810,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Cadvisor exporter",
+  "title": "Containers",
   "uid": "cadvisor",
   "version": 1,
   "description": "Simple exporter for cadvisor only"
