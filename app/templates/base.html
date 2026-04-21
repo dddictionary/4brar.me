@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta property="og:title" content="{{ title }}">
-    <meta property="og:description" content="Abrar Habib — Portfolio">
+    <meta property="og:description" content="Abrar Habib — Developer & Creator">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,35 +17,45 @@
     {% block head %}{% endblock %}
 </head>
 <body>
-    <nav class="nav" id="nav">
-        <a href="/" class="nav__logo">AH</a>
-        <button class="nav__toggle" id="navToggle" aria-label="Toggle navigation">
-            <span></span>
-            <span></span>
-        </button>
-        <div class="nav__links" id="navLinks">
-            {% for item in navigation %}
-            <a href="{{ item.href }}" class="nav__link {% if request_path == item.href %}nav__link--active{% endif %}">{{ item.caption }}</a>
-            {% endfor %}
-        </div>
-    </nav>
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar" id="sidebar">
+        <a href="#top" class="sidebar__brand">AH</a>
 
-    <main class="main">
+        <nav class="sidebar__nav" id="sidebarNav">
+            {% for item in navigation %}
+            <a href="{{ item.href }}" class="sidebar__link">{{ item.caption }}</a>
+            {% endfor %}
+        </nav>
+
+        <div class="sidebar__footer">
+            <span>&copy; 2026</span>
+        </div>
+
+        <button class="sidebar__toggle" id="sidebarToggle" aria-label="Toggle navigation">
+            <span></span><span></span>
+        </button>
+    </aside>
+
+    <!-- ── Content ── -->
+    <main class="content">
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="footer">
-        <span class="footer__line"></span>
-        <p class="footer__text">&copy; 2026 Abrar Habib</p>
-    </footer>
-
     <script>
-        // Mobile nav toggle
-        const toggle = document.getElementById('navToggle');
-        const links = document.getElementById('navLinks');
-        toggle.addEventListener('click', () => {
-            links.classList.toggle('nav__links--open');
-            toggle.classList.toggle('nav__toggle--open');
+        // Mobile sidebar toggle
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar--open');
+            sidebarToggle.classList.toggle('sidebar__toggle--open');
+        });
+
+        // Close sidebar on link click (mobile)
+        document.querySelectorAll('.sidebar__link').forEach(link => {
+            link.addEventListener('click', () => {
+                sidebar.classList.remove('sidebar--open');
+                sidebarToggle.classList.remove('sidebar__toggle--open');
+            });
         });
 
         // Scroll reveal
@@ -57,14 +67,8 @@
                     observer.unobserve(entry.target);
                 }
             });
-        }, { threshold: 0.1 });
+        }, { threshold: 0.08 });
         reveals.forEach(el => observer.observe(el));
-
-        // Nav background on scroll
-        const nav = document.getElementById('nav');
-        window.addEventListener('scroll', () => {
-            nav.classList.toggle('nav--scrolled', window.scrollY > 40);
-        });
     </script>
 
     {% block scripts %}{% endblock %}
