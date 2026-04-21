@@ -65,7 +65,7 @@ jobs:
 
       - name: Test page routes return 200
         run: |
-          routes="/ /aboutme /work /education /hobbies /travels /timeline"
+          routes="/ /blog"
           for route in $routes; do
             status=$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:5000${route}")
             if [ "$status" != "200" ]; then
@@ -73,6 +73,18 @@ jobs:
               exit 1
             fi
             echo "OK: ${route} returned 200"
+          done
+
+      - name: Test old routes redirect (301)
+        run: |
+          routes="/aboutme /work /education /hobbies /travels /timeline"
+          for route in $routes; do
+            status=$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:5000${route}")
+            if [ "$status" != "301" ]; then
+              echo "FAIL: ${route} returned ${status} (expected 301)"
+              exit 1
+            fi
+            echo "OK: ${route} returned 301"
           done
 
       - name: Test POST /api/timeline_post
