@@ -368,8 +368,8 @@ img { max-width: 100%; display: block; }
 .exp__logo {
     width: 22px;
     height: 22px;
-    color: var(--text-dim);
     flex-shrink: 0;
+    filter: invert(0.65);
 }
 
 .exp__role {
