@@ -481,6 +481,55 @@ img { max-width: 100%; display: block; }
 }
 
 /* ============================================
+   Blog
+   ============================================ */
+.blog-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.blog-entry {
+    display: block;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    transition: padding-left 0.25s;
+}
+.blog-entry:hover {
+    padding-left: 12px;
+}
+
+.blog-entry__date {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.3px;
+}
+
+.blog-entry__title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+    margin: 6px 0 8px;
+    transition: color 0.2s;
+}
+.blog-entry:hover .blog-entry__title {
+    color: var(--accent);
+}
+
+.blog-entry__preview {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.7;
+}
+
+.blog-empty {
+    color: var(--text-dim);
+    font-size: 14px;
+    padding: 60px 0;
+}
+
+/* ============================================
    Guestbook / Timeline
    ============================================ */
 .guestbook-form {

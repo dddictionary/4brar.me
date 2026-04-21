@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="sect" style="min-height: 80vh;">
+    <div class="sect__inner">
+        <p class="sect__label reveal">Blog</p>
+
+        {% if posts %}
+        <div class="blog-list">
+            {% for post in posts %}
+            <a href="/blog/{{ post.slug }}" class="blog-entry reveal">
+                <span class="blog-entry__date">{{ post.date }}</span>
+                <h2 class="blog-entry__title">{{ post.title }}</h2>
+                <p class="blog-entry__preview">{{ post.preview }}</p>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="blog-empty reveal">Nothing here yet. Check back soon.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -45,6 +45,16 @@ async def test_index_renders_data(client):
     assert "Paris, France" in html
 
 
+# ── Blog ──
+
+@pytest.mark.asyncio
+async def test_blog(client):
+    response = await client.get("/blog")
+    assert response.status_code == 200
+    assert "Blog" in response.text
+    assert "Nothing here yet" in response.text
+
+
 # ── Old routes redirect to anchors ──
 
 @pytest.mark.asyncio

@@ -19,6 +19,7 @@ NAV_ITEMS = [
     {"href": "#experience", "caption": "experience"},
     {"href": "#travels", "caption": "travels"},
     {"href": "#guestbook", "caption": "guestbook"},
+    {"href": "/blog", "caption": "blog"},
 ]
 
 SKILLS = [
@@ -52,6 +53,13 @@ async def index():
         locations=location_items,
         skills=SKILLS,
     )
+
+
+# ── Blog ──
+
+@router.get("/blog", response_class=HTMLResponse)
+async def blog():
+    return render("blog.html", title="Abrar Habib — Blog", request_path="/blog", posts=[])
 
 
 # ── Redirects for old routes ──
