@@ -443,31 +443,8 @@ img { max-width: 100%; display: block; }
 }
 
 /* ============================================
-   Map / Travels
+   Travels
    ============================================ */
-.map-container {
-    border-radius: var(--radius);
-    overflow: hidden;
-    border: 1px solid var(--border);
-    margin-bottom: 28px;
-}
-
-.map-container #map {
-    height: 400px;
-    width: 100%;
-}
-
-/* Dark Leaflet tiles */
-.leaflet-tile-pane { filter: brightness(0.7) contrast(1.1) saturate(0.3); }
-.leaflet-control-attribution { opacity: 0.4; font-size: 10px !important; }
-.leaflet-popup-content-wrapper {
-    background: var(--bg-card) !important;
-    color: var(--white) !important;
-    border-radius: var(--radius) !important;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
-}
-.leaflet-popup-tip { background: var(--bg-card) !important; }
-
 .location-pills {
     display: flex;
     flex-wrap: wrap;

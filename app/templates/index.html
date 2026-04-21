@@ -106,9 +106,6 @@
 <section class="sect" id="travels">
     <div class="sect__inner">
         <p class="sect__label reveal">Travels</p>
-        <div class="map-container reveal">
-            <div id="map" data-locations='{{ locations | json_encode() | safe }}'></div>
-        </div>
         <div class="location-pills reveal">
             {% for loc in locations %}
             <span class="pill">{{ loc.name }}</span>
@@ -142,9 +139,6 @@
 {% endblock %}
 
 {% block scripts %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="/static/js/map.js"></script>
 <script>
     // ── Guestbook ──
     async function loadPosts() {
