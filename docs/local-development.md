@@ -1,32 +1,118 @@
 # Local Development
 
-## Prerequisites
+## Option A — Native (recommended for development)
+
+### Prerequisites
+
+- Python 3.12+
+- [uv](https://docs.astral.sh/uv/) (`brew install uv` or `curl -LsSf https://astral.sh/uv/install.sh | sh`)
+- MySQL-compatible server — MariaDB or Percona via Homebrew
+
+### 1. Set up Python environment
+
+```bash
+uv venv .venv
+source .venv/bin/activate
+uv pip install -r requirements.txt
+
+# Test dependencies
+uv pip install pytest pytest-asyncio httpx
+```
+
+### 2. Set up the database
+
+Install MariaDB (or use an existing MySQL-compatible server like Percona):
+
+```bash
+brew install mariadb
+brew services start mariadb
+```
+
+> **Note:** If you already have `percona-server@8.0` or another MySQL server installed, you can use that instead — just `brew services start percona-server@8.0`.
+
+Create the database and set a password:
+
+```bash
+mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'secret';"
+mysql -u root -psecret -e "CREATE DATABASE IF NOT EXISTS portfolio;"
+```
+
+### 3. Configure environment
+
+```bash
+cp example.env .env
+```
+
+Edit `.env`:
+
+```
+URL=localhost:5000
+MYSQL_HOST=127.0.0.1
+MYSQL_USER=root
+MYSQL_PASSWORD=secret
+MYSQL_DATABASE=portfolio
+```
+
+### 4. Start the app
+
+```bash
+source .venv/bin/activate
+uvicorn app.main:app --port 5000 --reload
+```
+
+The app runs migrations automatically on startup (from `migrations/`). Open [http://localhost:5000](http://localhost:5000).
+
+### 5. Run tests
+
+Tests mock the database — no MySQL needed:
+
+```bash
+python -m pytest tests/ -v
+```
+
+---
+
+## Option B — Docker Compose
+
+### Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) and Docker Compose
-- (Optional) [Rust toolchain](https://rustup.rs/) if you want to build outside Docker
 
-## Quick Start
+### 1. Configure environment
 
-1. Create a `.env` file at the repo root:
+```bash
+cp example.env .env
+```
+
+Edit `.env`:
 
 ```
-MYSQL_DATABASE=portfolio
+URL=localhost:5000
+MYSQL_HOST=mysql
 MYSQL_USER=dev
 MYSQL_PASSWORD=dev
-MYSQL_HOST=mysql
+MYSQL_DATABASE=portfolio
 MARIADB_ROOT_PASSWORD=rootpass
-URL=localhost:5000
 ```
 
-2. Build and start everything:
+> **Note:** `MYSQL_HOST=mysql` refers to the Docker service name, not localhost.
+
+### 2. Build and start
 
 ```bash
 docker compose up --build
 ```
 
-3. Open [http://localhost:5000](http://localhost:5000) in your browser.
+### 3. Stop
 
-The app and MariaDB will start together. Database tables are created and seeded automatically via the migration files in `migrations/`.
+```bash
+docker compose down
+
+# To also wipe the database volume:
+docker compose down -v
+```
+
+---
 
 ## Verifying It Works
 
@@ -36,7 +122,7 @@ Once the app is running, check these routes:
 |-------|-----------------|
 | `/` | Hero section with name and bio |
 | `/aboutme` | About me content |
-| `/work` | Work experience cards (pulled from DB) |
+| `/work` | Work experience cards |
 | `/education` | Education card |
 | `/hobbies` | Hobby cards with images |
 | `/travels` | Interactive map with location markers |
@@ -54,47 +140,15 @@ curl -X POST http://localhost:5000/api/timeline_post \
 curl http://localhost:5000/api/timeline_post
 ```
 
-## Building Without Docker
-
-If you have Rust installed locally, you can build and run the binary directly. You'll need a running MariaDB instance.
-
-```bash
-# Build
-cargo build --release
-
-# Set env vars (point to your local MariaDB)
-export MYSQL_USER=dev
-export MYSQL_PASSWORD=dev
-export MYSQL_HOST=127.0.0.1
-export MYSQL_DATABASE=portfolio
-export URL=localhost:5000
-
-# Run
-./target/release/backend
-```
-
 ## Adding Content
 
-To add new content (hobby, job, location, etc.), create a new SQL migration file:
+Create a new SQL migration file in `migrations/`:
 
 ```bash
-# Example: adding a new work experience
 cat > migrations/003_add_new_job.sql << 'EOF'
 INSERT IGNORE INTO work_experiences (title, role, startdate, enddate, description)
 VALUES ('New Company', 'Software Engineer', 'Jan 2026', 'Present', 'Description here.');
 EOF
 ```
 
-Migrations run automatically on startup. The `INSERT IGNORE` ensures they're idempotent — restarting the app won't duplicate data.
-
-## Stopping
-
-```bash
-docker compose down
-```
-
-Add `-v` to also wipe the database volume:
-
-```bash
-docker compose down -v
-```
+Migrations run automatically on startup. `INSERT IGNORE` ensures they're idempotent — restarting the app won't duplicate data.

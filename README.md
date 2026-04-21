@@ -32,45 +32,25 @@ For each of these tasks, you should create an [Issue](https://docs.github.com/en
 
 ## Getting Started
 
-You need to do all your progress here.
+See [docs/local-development.md](docs/local-development.md) for full setup instructions.
 
-## Installation
-
-Make sure you have python3 and pip installed
-
-Create and activate virtual environment using virtualenv
-```bash
-$ python -m venv python3-virtualenv
-$ source python3-virtualenv/bin/activate
-```
-
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install all dependencies!
+**Quick start (native):**
 
 ```bash
-pip install -r requirements.txt
+uv venv .venv && source .venv/bin/activate
+uv pip install -r requirements.txt
+cp example.env .env  # then edit with your MySQL credentials
+uvicorn app.main:app --port 5000 --reload
 ```
 
-## Usage
+**Quick start (Docker):**
 
-Create a .env file using the example.env template (make a copy using the variables inside of the template)
-
-Start flask development server
 ```bash
-$ export FLASK_ENV=development
-$ flask run
+cp example.env .env  # then edit
+docker compose up --build
 ```
 
-You should get a response like this in the terminal:
-```
-❯ flask run
- * Environment: development
- * Debug mode: on
- * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
-```
-
-You'll now be able to access the website at `localhost:5000` or `127.0.0.1:5000` in the browser!
-
-*Note: The portfolio site will only work on your local machine while you have it running inside of your terminal. We'll go through how to host it in the cloud in the next few weeks!*
+Open [http://localhost:5000](http://localhost:5000) in the browser.
 
 ## Contributing
 
