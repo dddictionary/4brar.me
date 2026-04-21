@@ -4,8 +4,6 @@ import pytest
 
 
 MOCK_WORK = [{"title": "Shopify", "role": "Intern", "startdate": "Sep 2025", "enddate": "Present", "description": "Did stuff"}]
-MOCK_EDU = [{"title": "CUNY", "startdate": "Aug 2022", "enddate": "Dec 2025", "description": "CS degree"}]
-MOCK_HOBBIES = [{"title": "Soccer", "description": "Fun", "source": "https://example.com/img.jpg"}]
 MOCK_LOCATIONS = [{"name": "Paris, France", "lat": 48.8566, "lng": 2.3522}]
 
 
@@ -13,15 +11,13 @@ def _patch_all():
     """Patch all DB fetchers for the single-page index route."""
     return [
         patch("app.routes.pages.get_work_experiences", new_callable=AsyncMock, return_value=MOCK_WORK),
-        patch("app.routes.pages.get_education", new_callable=AsyncMock, return_value=MOCK_EDU),
-        patch("app.routes.pages.get_hobbies", new_callable=AsyncMock, return_value=MOCK_HOBBIES),
         patch("app.routes.pages.get_locations", new_callable=AsyncMock, return_value=MOCK_LOCATIONS),
     ]
 
 
 @pytest.mark.asyncio
 async def test_index(client):
-    with _patch_all()[0], _patch_all()[1], _patch_all()[2], _patch_all()[3]:
+    with _patch_all()[0], _patch_all()[1]:
         response = await client.get("/")
     assert response.status_code == 200
     assert "Abrar Habib" in response.text
@@ -30,13 +26,11 @@ async def test_index(client):
 @pytest.mark.asyncio
 async def test_index_has_sections(client):
     """The single page should contain all sections."""
-    with _patch_all()[0], _patch_all()[1], _patch_all()[2], _patch_all()[3]:
+    with _patch_all()[0], _patch_all()[1]:
         response = await client.get("/")
     html = response.text
     assert 'id="about"' in html
     assert 'id="experience"' in html
-    assert 'id="education"' in html
-    assert 'id="hobbies"' in html
     assert 'id="travels"' in html
     assert 'id="guestbook"' in html
 
@@ -44,12 +38,10 @@ async def test_index_has_sections(client):
 @pytest.mark.asyncio
 async def test_index_renders_data(client):
     """The single page should render seeded data."""
-    with _patch_all()[0], _patch_all()[1], _patch_all()[2], _patch_all()[3]:
+    with _patch_all()[0], _patch_all()[1]:
         response = await client.get("/")
     html = response.text
     assert "Shopify" in html
-    assert "CUNY" in html
-    assert "Soccer" in html
     assert "Paris, France" in html
 
 

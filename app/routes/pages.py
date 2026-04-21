@@ -17,8 +17,6 @@ env.filters["json_encode"] = lambda v: json.dumps(v)
 NAV_ITEMS = [
     {"href": "#about", "caption": "about"},
     {"href": "#experience", "caption": "experience"},
-    {"href": "#education", "caption": "education"},
-    {"href": "#hobbies", "caption": "interests"},
     {"href": "#travels", "caption": "travels"},
     {"href": "#guestbook", "caption": "guestbook"},
 ]
@@ -43,8 +41,6 @@ def render(template_name: str, **context) -> HTMLResponse:
 async def index():
     pool = await get_pool()
     work_items = await get_work_experiences(pool)
-    edu_items = await get_education(pool)
-    hobby_items = await get_hobbies(pool)
     location_items = await get_locations(pool)
     url = os.environ.get("URL", "http://localhost:5000")
     return render(
@@ -53,8 +49,6 @@ async def index():
         url=url,
         request_path="/",
         work=work_items,
-        education=edu_items,
-        hobbies=hobby_items,
         locations=location_items,
         skills=SKILLS,
     )

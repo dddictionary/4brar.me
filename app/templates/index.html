@@ -73,44 +73,6 @@
     </div>
 </section>
 
-<!-- ─── Education ─── -->
-<section class="sect" id="education">
-    <div class="sect__inner">
-        <p class="sect__label reveal">Education</p>
-        <div class="exp-list">
-            {% for item in education %}
-            <div class="exp reveal">
-                <div class="exp__side">
-                    <span class="exp__date">{{ item.startdate }} — {{ item.enddate }}</span>
-                </div>
-                <div class="exp__main">
-                    <h3 class="exp__role">{{ item.title }}</h3>
-                    <p class="exp__desc">{{ item.description }}</p>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-
-<!-- ─── Hobbies ─── -->
-<section class="sect" id="hobbies">
-    <div class="sect__inner">
-        <p class="sect__label reveal">Interests</p>
-        <div class="hobby-mosaic">
-            {% for item in hobbies %}
-            <div class="hobby-tile reveal">
-                <img src="{{ item.source }}" alt="{{ item.title }}" loading="lazy">
-                <div class="hobby-tile__overlay">
-                    <h4>{{ item.title }}</h4>
-                    <p>{{ item.description }}</p>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-
 <!-- ─── Travels ─── -->
 <section class="sect" id="travels">
     <div class="sect__inner">
