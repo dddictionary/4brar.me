@@ -15,10 +15,10 @@ env = Environment(loader=FileSystemLoader(templates_dir), autoescape=True)
 env.filters["json_encode"] = lambda v: json.dumps(v)
 
 NAV_ITEMS = [
-    {"href": "#about", "caption": "about"},
-    {"href": "#experience", "caption": "experience"},
-    {"href": "#travels", "caption": "travels"},
-    {"href": "#guestbook", "caption": "guestbook"},
+    {"href": "/#about", "caption": "about"},
+    {"href": "/#experience", "caption": "experience"},
+    {"href": "/#travels", "caption": "travels"},
+    {"href": "/#guestbook", "caption": "guestbook"},
     {"href": "/blog", "caption": "blog"},
 ]
 
