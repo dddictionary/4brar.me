@@ -193,11 +193,20 @@ img { max-width: 100%; display: block; }
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         background: rgba(10, 10, 10, 0.97);
+        visibility: hidden;
     }
-    .sidebar--open { transform: translateX(0); }
+    .sidebar--open {
+        transform: translateX(0);
+        visibility: visible;
+    }
     .sidebar__toggle { display: flex; }
     .sidebar__backdrop { display: block; }
-    .content { margin-left: 0; padding-left: 0; }
+    .content { margin-left: 0 !important; padding-left: 0; }
+
+    html, body {
+        overflow-x: hidden;
+        width: 100%;
+    }
 }
 
 /* ============================================
