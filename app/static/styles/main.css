@@ -176,6 +176,14 @@ img { max-width: 100%; display: block; }
     opacity: 1;
 }
 
+/* ============================================
+   Content Area
+   ============================================ */
+.content {
+    margin-left: var(--sidebar-w);
+    min-height: 100vh;
+}
+
 /* ── Mobile sidebar ── */
 @media (max-width: 900px) {
     .sidebar {
@@ -190,14 +198,6 @@ img { max-width: 100%; display: block; }
     .sidebar__toggle { display: flex; }
     .sidebar__backdrop { display: block; }
     .content { margin-left: 0; padding-left: 0; }
-}
-
-/* ============================================
-   Content Area
-   ============================================ */
-.content {
-    margin-left: var(--sidebar-w);
-    min-height: 100vh;
 }
 
 /* ============================================
