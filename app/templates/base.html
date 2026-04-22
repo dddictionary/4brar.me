@@ -17,6 +17,12 @@
     {% block head %}{% endblock %}
 </head>
 <body>
+    <!-- ── Mobile toggle (outside sidebar so it's always visible) ── -->
+    <button class="sidebar__toggle" id="sidebarToggle" aria-label="Toggle navigation">
+        <span></span><span></span>
+    </button>
+    <div class="sidebar__backdrop" id="sidebarBackdrop"></div>
+
     <!-- ── Sidebar ── -->
     <aside class="sidebar" id="sidebar">
         <a href="/" class="sidebar__brand">AH</a>
@@ -30,10 +36,6 @@
         <div class="sidebar__footer">
             <span>&copy; 2026</span>
         </div>
-
-        <button class="sidebar__toggle" id="sidebarToggle" aria-label="Toggle navigation">
-            <span></span><span></span>
-        </button>
     </aside>
 
     <!-- ── Content ── -->
@@ -45,17 +47,34 @@
         // Mobile sidebar toggle
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+
+        function closeSidebar() {
+            sidebar.classList.remove('sidebar--open');
+            sidebarToggle.classList.remove('sidebar__toggle--open');
+            backdrop.classList.remove('sidebar__backdrop--visible');
+            document.body.style.overflow = '';
+        }
+
+        function openSidebar() {
+            sidebar.classList.add('sidebar--open');
+            sidebarToggle.classList.add('sidebar__toggle--open');
+            backdrop.classList.add('sidebar__backdrop--visible');
+            document.body.style.overflow = 'hidden';
+        }
+
         sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('sidebar--open');
-            sidebarToggle.classList.toggle('sidebar__toggle--open');
+            if (sidebar.classList.contains('sidebar--open')) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
         });
 
-        // Close sidebar on link click (mobile)
+        // Close sidebar on backdrop tap or link click (mobile)
+        backdrop.addEventListener('click', closeSidebar);
         document.querySelectorAll('.sidebar__link').forEach(link => {
-            link.addEventListener('click', () => {
-                sidebar.classList.remove('sidebar--open');
-                sidebarToggle.classList.remove('sidebar__toggle--open');
-            });
+            link.addEventListener('click', closeSidebar);
         });
 
         // Scroll reveal
