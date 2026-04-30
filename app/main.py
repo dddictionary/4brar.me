@@ -65,6 +65,11 @@ async def track_metrics(request: Request, call_next):
     return response
 
 
+@app.get("/healthz")
+async def healthz():
+    return {"status": "ok"}
+
+
 app.include_router(api_router)
 app.include_router(pages_router)
 
