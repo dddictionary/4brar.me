@@ -19,7 +19,7 @@ jobs:
       contents: read
       packages: write
     outputs:
-      image_tag: ${{ steps.meta.outputs.version }}
+      image_tag: ${{ steps.tag.outputs.sha }}
     steps:
       - uses: actions/checkout@v4
 
@@ -40,6 +40,10 @@ jobs:
           tags: |
             type=sha,format=short
             type=raw,value=latest
+
+      - name: Compute short sha tag
+        id: tag
+        run: echo "sha=$(echo ${{ github.sha }} | cut -c1-7)" >> "$GITHUB_OUTPUT"
 
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -86,37 +90,54 @@ jobs:
           ssh istaroth "mkdir -p /root/k8s"
           scp -r k8s/. istaroth:/root/k8s/
 
-      - name: Apply secrets (idempotent)
+      - name: Install kubectl on runner
+        uses: azure/setup-kubectl@v4
+
+      - name: Ensure namespaces exist
         run: |
-          ssh istaroth bash -s <<'EOF'
-            export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-            kubectl apply -f /root/k8s/namespace.yaml
+          ssh istaroth "KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl apply -f /root/k8s/namespace.yaml"
 
-            kubectl -n portfolio create secret generic backend-secrets \
-              --from-literal=MYSQL_DATABASE="$MYSQL_DATABASE" \
-              --from-literal=MYSQL_USER="$MYSQL_USER" \
-              --from-literal=MYSQL_PASSWORD="$MYSQL_PASSWORD" \
-              --from-literal=MYSQL_HOST=mariadb \
-              --from-literal=URL="$URL" \
-              --dry-run=client -o yaml | kubectl apply -f -
+      - name: Apply backend-secrets
+        run: |
+          kubectl create secret generic backend-secrets \
+            -n portfolio \
+            --from-literal=MYSQL_DATABASE="$MYSQL_DATABASE" \
+            --from-literal=MYSQL_USER="$MYSQL_USER" \
+            --from-literal=MYSQL_PASSWORD="$MYSQL_PASSWORD" \
+            --from-literal=MYSQL_HOST=mariadb \
+            --from-literal=URL="$URL" \
+            --dry-run=client -o yaml \
+            | ssh istaroth "KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl apply -f -"
+        env:
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          URL: ${{ secrets.URL }}
 
-            kubectl -n portfolio create secret generic mariadb-secrets \
-              --from-literal=MYSQL_DATABASE="$MYSQL_DATABASE" \
-              --from-literal=MYSQL_USER="$MYSQL_USER" \
-              --from-literal=MYSQL_PASSWORD="$MYSQL_PASSWORD" \
-              --from-literal=MARIADB_ROOT_PASSWORD="$MARIADB_ROOT_PASSWORD" \
-              --dry-run=client -o yaml | kubectl apply -f -
-
-            kubectl -n monitoring create secret generic grafana-secrets \
-              --from-literal=GRAFANA_PASSWORD="$GRAFANA_PASSWORD" \
-              --dry-run=client -o yaml | kubectl apply -f -
-          EOF
+      - name: Apply mariadb-secrets
+        run: |
+          kubectl create secret generic mariadb-secrets \
+            -n portfolio \
+            --from-literal=MYSQL_DATABASE="$MYSQL_DATABASE" \
+            --from-literal=MYSQL_USER="$MYSQL_USER" \
+            --from-literal=MYSQL_PASSWORD="$MYSQL_PASSWORD" \
+            --from-literal=MARIADB_ROOT_PASSWORD="$MARIADB_ROOT_PASSWORD" \
+            --dry-run=client -o yaml \
+            | ssh istaroth "KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl apply -f -"
         env:
           MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
           MYSQL_USER: ${{ secrets.MYSQL_USER }}
           MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
           MARIADB_ROOT_PASSWORD: ${{ secrets.MARIADB_ROOT_PASSWORD }}
-          URL: ${{ secrets.URL }}
+
+      - name: Apply grafana-secrets
+        run: |
+          kubectl create secret generic grafana-secrets \
+            -n monitoring \
+            --from-literal=GRAFANA_PASSWORD="$GRAFANA_PASSWORD" \
+            --dry-run=client -o yaml \
+            | ssh istaroth "KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl apply -f -"
+        env:
           GRAFANA_PASSWORD: ${{ secrets.GRAFANA_PASSWORD }}
 
       - name: Apply k8s manifests
