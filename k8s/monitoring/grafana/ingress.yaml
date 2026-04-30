@@ -6,7 +6,7 @@ metadata:
 spec:
   ingressClassName: nginx-internal
   rules:
-    - host: observe-home.4brar.me
+    - host: observe.4brar.me
       http:
         paths:
           - path: /

@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feat/k3s-istaroth
   workflow_dispatch:
 
 env:

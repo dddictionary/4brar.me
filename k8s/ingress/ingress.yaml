@@ -9,7 +9,7 @@ metadata:
 spec:
   ingressClassName: nginx-internal
   rules:
-    - host: home.4brar.me
+    - host: 4brar.me
       http:
         paths:
           - path: /
