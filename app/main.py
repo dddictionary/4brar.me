@@ -1,4 +1,5 @@
 import logging
+import mimetypes
 import os
 import time
 from contextlib import asynccontextmanager
@@ -72,6 +73,9 @@ async def healthz():
 
 app.include_router(api_router)
 app.include_router(pages_router)
+
+# Served as application/wasm so browsers can compile it while streaming.
+mimetypes.add_type("application/wasm", ".wasm")
 
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
