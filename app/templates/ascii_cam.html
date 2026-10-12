@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="sect ascii-cam" id="ascii-cam">
+    <div class="ascii-cam__inner">
+        <p class="sect__label">Lab / ASCII cam</p>
+        <p class="sect__subtitle">Your webcam, rendered as text by <a href="https://github.com/dddictionary/ascii-rs" target="_blank" rel="noopener">textura</a> compiled to WebAssembly. Frames never leave your browser.</p>
+
+        <div class="ascii-cam__controls">
+            <button type="button" id="camToggle" class="form-btn" disabled>Start camera</button>
+            <label class="ascii-cam__control">
+                <span>Ramp</span>
+                <select id="rampSelect" class="form-input"></select>
+            </label>
+            <label class="ascii-cam__control">
+                <span>Detail</span>
+                <input type="range" id="detailRange" min="40" max="200" step="10" value="100">
+            </label>
+            <label class="ascii-cam__control ascii-cam__control--inline">
+                <input type="checkbox" id="normalizeToggle" checked>
+                <span>Normalize</span>
+            </label>
+        </div>
+
+        <p class="ascii-cam__status" id="camStatus">Loading…</p>
+
+        <div class="ascii-cam__stage">
+            <canvas id="asciiOutput" class="ascii-cam__output"></canvas>
+        </div>
+
+        <video id="camVideo" autoplay playsinline muted hidden></video>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/ascii-cam.js"></script>
+{% endblock %}

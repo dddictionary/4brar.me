@@ -641,3 +641,70 @@ img { max-width: 100%; display: block; }
     text-align: center;
     padding: 40px 0;
 }
+
+/* ============================================
+   Lab — ASCII cam
+   ============================================ */
+.ascii-cam {
+    border-top: none;
+    min-height: 100vh;
+}
+
+.ascii-cam__inner { max-width: 1100px; }
+
+.ascii-cam .sect__subtitle a { color: var(--accent); }
+
+.ascii-cam__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 16px 24px;
+    margin-bottom: 16px;
+}
+
+.ascii-cam__controls .form-btn { margin-top: 0; }
+.ascii-cam__controls .form-btn:disabled { opacity: 0.5; cursor: default; }
+
+.ascii-cam__control {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+}
+
+.ascii-cam__control .form-input { width: auto; padding: 8px 12px; }
+.ascii-cam__control input[type="range"] { accent-color: var(--accent); width: 160px; }
+
+.ascii-cam__control--inline {
+    flex-direction: row;
+    align-items: center;
+    padding-bottom: 10px;
+}
+.ascii-cam__control--inline input { accent-color: var(--accent); }
+
+.ascii-cam__status {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+}
+
+.ascii-cam__stage {
+    background: #000;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    min-height: 240px;
+}
+
+.ascii-cam__output {
+    display: block;
+    width: 100%;
+}
+
+@media (max-width: 520px) {
+    .ascii-cam__control input[type="range"] { width: 100%; }
+    .ascii-cam__control { flex: 1 1 100%; }
+}

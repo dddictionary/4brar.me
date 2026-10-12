@@ -97,3 +97,20 @@ async def test_timeline_redirects(client):
     response = await client.get("/timeline", follow_redirects=False)
     assert response.status_code == 301
     assert response.headers["location"] == "/#guestbook"
+
+
+# ── Lab ──
+
+@pytest.mark.asyncio
+async def test_ascii_cam(client):
+    response = await client.get("/lab/ascii-cam")
+    assert response.status_code == 200
+    assert 'id="asciiOutput"' in response.text
+    assert "/static/js/ascii-cam.js" in response.text
+
+
+@pytest.mark.asyncio
+async def test_wasm_served_with_wasm_mime_type(client):
+    response = await client.get("/static/wasm/textura/textura_bg.wasm")
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/wasm"

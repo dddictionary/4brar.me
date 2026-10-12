@@ -62,6 +62,13 @@ async def blog():
     return render("blog.html", title="Abrar Habib — Blog", request_path="/blog", posts=[])
 
 
+# ── Lab ──
+
+@router.get("/lab/ascii-cam", response_class=HTMLResponse)
+async def ascii_cam():
+    return render("ascii_cam.html", title="Abrar Habib — ASCII cam", request_path="/lab/ascii-cam")
+
+
 # ── Redirects for old routes ──
 
 @router.get("/aboutme")
